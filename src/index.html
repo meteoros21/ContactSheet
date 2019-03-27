@@ -7,10 +7,18 @@
 <link rel="stylesheet" type="text/css" href="css/ion-contacts-sheet.css">
 <link rel="stylesheet" type="text/css" href="css/group-menu.css">
 <link rel="stylesheet" href="css/jquery-ui.css">
+<link rel="stylesheet" href="css/menu1.css">
+<link rel="stylesheet" href="css/toolbar.css">
+
 <script type="text/javascript" src="js/jquery-1.11.3.js"></script>
 <script type="text/javascript" src="js/jquery-ui.js"></script>
+
 <script type="text/javascript" src="interface.js"></script>
 <script type="text/javascript" src="js/ion-contacts-sheet.js"></script>
+
+<script type="text/javascript" src="js/menu1.js"></script>
+<script type="text/javascript" src="js/toolbar.js"></script>
+
 <script type="text/javascript" src="js/contact.js"></script>
 <script type="text/javascript" src="js/contact-io.js"></script>
 <script type="text/javascript" src="js/cell-data.js"></script>
@@ -137,22 +145,31 @@ body, html {
 </head>
 <body>
 <div style="position:relative; width:95%; height:100%; margin: 0 auto;">
-	<div id="doc-header" style="width:100%; height: 70px; border-bottom: 2px solid #aaa; padding: 20px 0">
-		<h1 style="margin: 0">Contact Sheet for Google</h1>
-		<div style="padding-bottom: 10px; text-align: right; margin-top:-20px">
-			<form name="form-navi" method="get" action="">
-				<input type="text" class="ipt" name="keyword"><select id="group-selector" name="groupId" class="ipt" style="width: 100px; margin: 0 10px">
-					<option value="">All</option>
-				</select><button id="btn-submit" type="submit" class="ipt">Query</button>
-				<button id="btn-refresh" type="button" class="ipt">Reload</button>
-				<button id="btn-find" type="button" class="ipt">Find</button>
-				<button id="btn-option" type="button" class="ipt">Setting</button>
-				<button id="btn-save" type="button" class="ipt">Save</button>
-			</form>
+	<div class="nav-container">
+		<div class="nav-icon-container">
+			<img class="nav-icon" src="img/document-xxl.png">
 		</div>
+		<div class="nav-title"><span style="margin-left: 5px; margin-bottom: 4px; display: inline-block">Someone's ContactSheet</span></div>
+		<div class="pulldown-menu-container"></div>
+		<div class="nav-toolbar"></div>
 	</div>
-	<div style="position:absolute; width:100%; top:70px; bottom: 50px">
-		<div class="table_wrap" style="position:absolute; top:20px; bottom:0; width: 100%; font-size: 14px"></div>
+
+	<!--<div id="doc-header" style="width:100%; height: 70px; border-bottom: 2px solid #aaa; padding: 20px 0">-->
+		<!--<h1 style="margin: 0">Contact Sheet for Google</h1>-->
+		<!--<div style="padding-bottom: 10px; text-align: right; margin-top:-20px">-->
+			<!--<form name="form-navi" method="get" action="">-->
+				<!--<input type="text" class="ipt" name="keyword"><select id="group-selector" name="groupId" class="ipt" style="width: 100px; margin: 0 10px">-->
+					<!--<option value="">All</option>-->
+				<!--</select><button id="btn-submit" type="submit" class="ipt">Query</button>-->
+				<!--<button id="btn-refresh" type="button" class="ipt">Reload</button>-->
+				<!--<button id="btn-find" type="button" class="ipt">Find</button>-->
+				<!--<button id="btn-option" type="button" class="ipt">Setting</button>-->
+				<!--<button id="btn-save" type="button" class="ipt">Save</button>-->
+			<!--</form>-->
+		<!--</div>-->
+	<!--</div>-->
+	<div style="position:absolute; width:100%; top:108px; bottom: 50px">
+		<div class="table_wrap" style="position:absolute; top:0px; bottom:0; width: 100%; font-size: 14px"></div>
 	</div>
 	<div style="position: absolute; bottom: 50px; right: 20px">
 		<button id="btn-add-contact" class="circle-button circle-button-large" style="z-index: 1000">+</a>

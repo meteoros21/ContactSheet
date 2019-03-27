@@ -25,6 +25,7 @@
 			redoBuffer: null,
 			sortInfo: {key: "full-name", type: "sortAsc"},
 			lastContactId: 1,
+			contextMenu: null,
 			columnInfo: [
 				{label:"Full name", type:"Name", width:"90px", key: "full-name"}, 
 				{label:"Family name", type:"Name", width:"50px", key:"family-name"},
@@ -1112,170 +1113,188 @@
 
 					// default soft
 					$(sheetInfo2.tableCol[0].rows[0].cells[0]).addClass('sortAsc');
-					
-					$('#context-menu1 div').each(function(index, obj) {
-						if (index == 0)
-						{
-							obj.addEventListener('click', function() {
-								sheetInfo2.mySheet.undo();
-							});
-						}
-						else if (index == 1)
-						{
-							obj.addEventListener('click', function() {
-								sheetInfo2.mySheet.redo();
-							});
-						}
-						else if (index == 2)
-						{
-							obj.addEventListener('click', function() {
-								document.execCommand('copy');
-							});
-						}
-						else if (index == 3)
-						{
-							obj.addEventListener('click', function() {
-								document.execCommand('cut');
-							});							
-						}
-						else if (index == 4) // paste
-						{
-							obj.addEventListener('click', function() {
-								
-								var mySheet = sheetInfo2.myPlugin;
-								if (mySheet.clipboardData == null)
-									return;
 
-								var text = mySheet.clipboardData.text;
-								var jsonString = mySheet.clipboardData.jsonString;
-								
-								if (jsonString != null && jsonString != '')
-								{
-									mySheet.pasteClipboardData(jsonString);
-								}
-								else
-								{
-									mySheet.setCurrentCellText(text);
-								}
-							});
-						}
-						else if (index == 5) // delete
-						{
-							obj.addEventListener('click', function() {
+					sheetInfo2.tableCell[0].oncontextmenu = function (e) {
+						if (sheetInfo2.contextMenu != null)
+							sheetInfo2.contextMenu.destroyMenu();
 
-								if (sheetInfo2.selectedRows != null && sheetInfo2.selectedRows.length > 0)
-								{
-									showWaitScreen().then(function() {
-										sheetInfo2.myPlugin.deleteSelectedRow();
-										hideWaitScreen();
-									});
-								}
-								else
-									sheetInfo2.myPlugin.deleteSelectedCellText();
-							});
-						}
-						else if (index == 6) // select row
-						{
-							obj.addEventListener('click', function() {
+						sheetInfo2.contextMenu = new PopupMenu(menuHandler);
+						var menuItemList = menuHandler.getMenuItemListForContext1();
+						sheetInfo2.contextMenu.createMenu(e.pageX, e.pageY, menuItemList);
 
-								var row = sheetInfo2.currentCell.row;	
-								sheetInfo2.tableHandler.selectRow(row);
-								sheetInfo2.tableHandler.setCurrentCell(0, row);
-							});
-						}
-						else if (index == 7) // group
-						{
-							obj.addEventListener('click', function() {
-
-								var rowArray = new Array();
-								var selectedGroups = new Array();
-
-								if (sheetInfo2.selectedRows != null && sheetInfo2.selectedRows.length > 0)
-								{
-									for (var i = 0; i < sheetInfo2.selectedRows.length; i++)
-									{
-										var row = sheetInfo2.selectedRows[i];
-										rowArray.push(row);
-									}
-								}
-								else if (sheetInfo2.selectedCells != null && sheetInfo2.selectedCells.length > 0)
-								{
-									for (var i = 0; i < sheetInfo2.selectedCells.length; i++)
-									{
-										var sel = sheetInfo2.selectedCells[i];
-										for (var j = sel.row1; j <= sel.row2; j++)
-										{
-											rowArray.push(j);
-										}
-									}
-								}
-								else
-								{
-									var row = sheetInfo2.currentCell.row;
-									rowArray.push(row);
-								}
-
-								for (var i = 0; i < rowArray.length; i++)
-								{
-									var row = rowArray[i];
-									var contact = sheetInfo2.getContactByRow(row);
-									var groups = contact.getValue('groups');
-
-									if (groups != null)
-									{
-										for (var k = 0; k < groups.length; k++)
-										{
-											var found = false;
-											var groupId = groups[k]['id'];
-											for (var j = 0; j < selectedGroups.length; j++)
-											{
-												if (selectedGroups[j] == groupId)
-												{
-													found = true;
-													break;
-												}
-											}
-
-											if (found == false)
-												selectedGroups.push(groupId);
-										}
-									}
-								}
-
-								onGroup(selectedGroups);
-							});
-						}
-					});
-					
-					sheetInfo2.tableCell.contextmenu(function(e) {
-						$('#context-menu1').css('display', 'block');
-						$('#context-menu1').css('left', e.pageX + 'px');
-						$('#context-menu1').css('top', e.pageY + 'px');
-
-						if (sheetInfo2.undoBuffer != null && sheetInfo2.undoBuffer.length > 0)
-						{
-							$('#context-menu-undo').removeClass('menu-item2');
-							$('#context-menu-undo').addClass('menu-item');
-						}
-						else
-						{
-							$('#context-menu-undo').removeClass('menu-item');
-							$('#context-menu-undo').addClass('menu-item2');
-						}
-
-						if (sheetInfo2.redoBuffer != null && sheetInfo2.redoBuffer.length > 0)
-						{
-							$('#context-menu-redo').removeClass('menu-item2');
-							$('#context-menu-redo').addClass('menu-item');
-						}
-						else
-						{
-							$('#context-menu-redo').removeClass('menu-item');
-							$('#context-menu-redo').addClass('menu-item2');
-						}
-
+						$(window).on('click.contextMenu', function (e) {
+							if (sheetInfo2.contextMenu != null) {
+								sheetInfo2.contextMenu.destroyMenu();
+								sheetInfo2.contextMenu = null;
+							}
+							$(window).off('click.contextMenu');
+						});
 						return false;
-					});
+					};
+					
+					// $('#context-menu1 div').each(function(index, obj) {
+					// 	if (index == 0)
+					// 	{
+					// 		obj.addEventListener('click', function() {
+					// 			sheetInfo2.mySheet.undo();
+					// 		});
+					// 	}
+					// 	else if (index == 1)
+					// 	{
+					// 		obj.addEventListener('click', function() {
+					// 			sheetInfo2.mySheet.redo();
+					// 		});
+					// 	}
+					// 	else if (index == 2)
+					// 	{
+					// 		obj.addEventListener('click', function() {
+					// 			document.execCommand('copy');
+					// 		});
+					// 	}
+					// 	else if (index == 3)
+					// 	{
+					// 		obj.addEventListener('click', function() {
+					// 			document.execCommand('cut');
+					// 		});
+					// 	}
+					// 	else if (index == 4) // paste
+					// 	{
+					// 		obj.addEventListener('click', function() {
+					//
+					// 			var mySheet = sheetInfo2.myPlugin;
+					// 			if (mySheet.clipboardData == null)
+					// 				return;
+					//
+					// 			var text = mySheet.clipboardData.text;
+					// 			var jsonString = mySheet.clipboardData.jsonString;
+					//
+					// 			if (jsonString != null && jsonString != '')
+					// 			{
+					// 				mySheet.pasteClipboardData(jsonString);
+					// 			}
+					// 			else
+					// 			{
+					// 				mySheet.setCurrentCellText(text);
+					// 			}
+					// 		});
+					// 	}
+					// 	else if (index == 5) // delete
+					// 	{
+					// 		obj.addEventListener('click', function() {
+					//
+					// 			if (sheetInfo2.selectedRows != null && sheetInfo2.selectedRows.length > 0)
+					// 			{
+					// 				showWaitScreen().then(function() {
+					// 					sheetInfo2.myPlugin.deleteSelectedRow();
+					// 					hideWaitScreen();
+					// 				});
+					// 			}
+					// 			else
+					// 				sheetInfo2.myPlugin.deleteSelectedCellText();
+					// 		});
+					// 	}
+					// 	else if (index == 6) // select row
+					// 	{
+					// 		obj.addEventListener('click', function() {
+					//
+					// 			var row = sheetInfo2.currentCell.row;
+					// 			sheetInfo2.tableHandler.selectRow(row);
+					// 			sheetInfo2.tableHandler.setCurrentCell(0, row);
+					// 		});
+					// 	}
+					// 	else if (index == 7) // group
+					// 	{
+					// 		obj.addEventListener('click', function() {
+					//
+					// 			var rowArray = new Array();
+					// 			var selectedGroups = new Array();
+					//
+					// 			if (sheetInfo2.selectedRows != null && sheetInfo2.selectedRows.length > 0)
+					// 			{
+					// 				for (var i = 0; i < sheetInfo2.selectedRows.length; i++)
+					// 				{
+					// 					var row = sheetInfo2.selectedRows[i];
+					// 					rowArray.push(row);
+					// 				}
+					// 			}
+					// 			else if (sheetInfo2.selectedCells != null && sheetInfo2.selectedCells.length > 0)
+					// 			{
+					// 				for (var i = 0; i < sheetInfo2.selectedCells.length; i++)
+					// 				{
+					// 					var sel = sheetInfo2.selectedCells[i];
+					// 					for (var j = sel.row1; j <= sel.row2; j++)
+					// 					{
+					// 						rowArray.push(j);
+					// 					}
+					// 				}
+					// 			}
+					// 			else
+					// 			{
+					// 				var row = sheetInfo2.currentCell.row;
+					// 				rowArray.push(row);
+					// 			}
+					//
+					// 			for (var i = 0; i < rowArray.length; i++)
+					// 			{
+					// 				var row = rowArray[i];
+					// 				var contact = sheetInfo2.getContactByRow(row);
+					// 				var groups = contact.getValue('groups');
+					//
+					// 				if (groups != null)
+					// 				{
+					// 					for (var k = 0; k < groups.length; k++)
+					// 					{
+					// 						var found = false;
+					// 						var groupId = groups[k]['id'];
+					// 						for (var j = 0; j < selectedGroups.length; j++)
+					// 						{
+					// 							if (selectedGroups[j] == groupId)
+					// 							{
+					// 								found = true;
+					// 								break;
+					// 							}
+					// 						}
+					//
+					// 						if (found == false)
+					// 							selectedGroups.push(groupId);
+					// 					}
+					// 				}
+					// 			}
+					//
+					// 			onGroup(selectedGroups);
+					// 		});
+					// 	}
+					// });
+					//
+					// sheetInfo2.tableCell.contextmenu(function(e) {
+					// 	$('#context-menu1').css('display', 'block');
+					// 	$('#context-menu1').css('left', e.pageX + 'px');
+					// 	$('#context-menu1').css('top', e.pageY + 'px');
+					//
+					// 	if (sheetInfo2.undoBuffer != null && sheetInfo2.undoBuffer.length > 0)
+					// 	{
+					// 		$('#context-menu-undo').removeClass('menu-item2');
+					// 		$('#context-menu-undo').addClass('menu-item');
+					// 	}
+					// 	else
+					// 	{
+					// 		$('#context-menu-undo').removeClass('menu-item');
+					// 		$('#context-menu-undo').addClass('menu-item2');
+					// 	}
+					//
+					// 	if (sheetInfo2.redoBuffer != null && sheetInfo2.redoBuffer.length > 0)
+					// 	{
+					// 		$('#context-menu-redo').removeClass('menu-item2');
+					// 		$('#context-menu-redo').addClass('menu-item');
+					// 	}
+					// 	else
+					// 	{
+					// 		$('#context-menu-redo').removeClass('menu-item');
+					// 		$('#context-menu-redo').addClass('menu-item2');
+					// 	}
+					//
+					// 	return false;
+					// });
 
 
 					$('#context-menu2 div').each(function(index, obj) {

@@ -13,6 +13,9 @@ html {
 	font-size:16px;
 }
 
+table {
+	border-spacing: 0;
+}
 h2.title {
 	font-size:20px;
 	font-family:'NanumSquare', sans-serif;

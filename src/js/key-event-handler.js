@@ -35,7 +35,7 @@ function keyDownHandlerForSheet(event)
 {
     var sheetInfo2 = mySheetInfo;
 
-    if (event.keyCode == 9) // tap
+    if (event.keyCode == 9) // tab
     {
         event.preventDefault();
 							

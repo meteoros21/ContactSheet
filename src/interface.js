@@ -20,6 +20,7 @@ var defaultColumnList = [
 			{label:"Note", type:"note", width:"200px", key:"note", visible:true}];
 
 var userColumnList = null;
+var menuHandler = null;
 
 function showWaitScreen()
 {
@@ -438,6 +439,62 @@ function createUserOption(columnList)
 	return userOption;
 }
 
+function MenuHandler()
+{
+	this.isEnable = function (menuId) {
+
+		if (menuId == 'cmd-export' || menuId == 'cmd-import')
+			return false;
+
+		return true;
+	}
+
+	this.doMenuAction = function(menuId) {
+		if (menuId == 'cmd-sync')
+			onSave();
+		else if (menuId == 'cmd-text-find')
+			onFind();
+		else
+			alert(menuId);
+	}
+
+	this.getMenuItemListForContext1 = function ()
+	{
+		var menuItemList = [
+			{id: 'cmd-undo', icon: 'img/undo.png', label: '실행취소', shortCut: '⌘+Z'},
+			{id: 'cmd-redo', icon: 'img/redo.png', label: '재실행', shortCut: '⌘+Y'},
+			{id: '', label: 'sep'},
+			{id: 'cmd-cut', icon: 'img/cut.png', label: '잘라내기', shortCut: '⌘+X'},
+			{id: 'cmd-paste', icon: 'img/paste.png', label: '붙여넣기', shortCut: '⌘+V'},
+			{id: 'cmd-copy', icon: 'img/copy.png', label: '복사', shortCut: '⌘+C'},
+			{id: '', label: 'sep'},
+			{id: 'cmd-delete-cell', icon: 'img/erase-v2.png', label: '값 삭제', shortCut: 'Del'},
+			{id: 'cmd-select-row', icon: 'img/delete-database.png', label: '행 색제', shortCut: '⌘+Del'},
+			{id: 'cmd-modify-group', label: '그룹 설정', shortCut: '⌘+G'},
+		];
+
+		return menuItemList;
+	}
+
+	this.getMenuItemListForContext2 = function ()
+	{
+		var menuItemList = [
+			{id: 'cmd-undo', icon: 'img/undo.png', label: '실행취소', shortCut: '⌘+Z'},
+			{id: 'cmd-redo', icon: 'img/redo.png', label: '재실행', shortCut: '⌘+Y'},
+			{id: '', label: 'sep'},
+			{id: 'cmd-cut', icon: 'img/cut.png', label: '잘라내기', shortCut: '⌘+X'},
+			{id: 'cmd-paste', icon: 'img/paste.png', label: '붙여넣기', shortCut: '⌘+V'},
+			{id: 'cmd-copy', icon: 'img/copy.png', label: '복사', shortCut: '⌘+C'},
+			{id: '', label: 'sep'},
+			{id: 'cmd-select-row', icon: 'img/delete-database.png', label: '행 색제', shortCut: '⌘+Del'},
+			{id: 'cmd-modify-group', label: '그룹 설정', shortCut: '⌘+G'},
+			{id: '', label: 'sep'},
+		];
+
+		return menuItemList;
+	}
+}
+
 // 프로그램 시작 시 호출되며, 프로그램을 초기화한다.
 function main()
 {
@@ -447,16 +504,26 @@ function main()
 		return this.split(org).join(dst);
 	};
 
-	document.forms['form-navi'].onsubmit = onQueryContacts;
-	
-	// 메인 버튼의 핸들러를 등록한다.
-	$('#btn-submit').on('click', onQueryContacts);
-	$('#btn-option').on('click', onSetOption);
-	$('#btn-refresh').on('click', onRefresh);
-	$('#btn-find').on('click', onFind);
-	$('#btn-save').on('click', onSave);
+	menuHandler = new MenuHandler();
 
-	$('#btn-add-contact').on('click', onAddContact);
+	var pulldownMenu = new Menu1(menuHandler);
+	pulldownMenu.init();
+	pulldownMenu.create($('.pulldown-menu-container'));
+
+	var toolbar = new Toolbar(menuHandler);
+	toolbar.init();
+	toolbar.create($('.nav-toolbar'));
+
+	// document.forms['form-navi'].onsubmit = onQueryContacts;
+	//
+	// // 메인 버튼의 핸들러를 등록한다.
+	// $('#btn-submit').on('click', onQueryContacts);
+	// $('#btn-option').on('click', onSetOption);
+	// $('#btn-refresh').on('click', onRefresh);
+	// $('#btn-find').on('click', onFind);
+	// $('#btn-save').on('click', onSave);
+	//
+	// $('#btn-add-contact').on('click', onAddContact);
 	
 	// Find-Dialog의 키보드 포커스를 뺏기위한 코드입니다.
 	$('#test-input').on('keydown', function(event) {
